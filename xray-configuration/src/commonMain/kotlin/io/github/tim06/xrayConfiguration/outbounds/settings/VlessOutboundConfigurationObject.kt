@@ -1,6 +1,5 @@
 package io.github.tim06.xrayConfiguration.outbounds.settings
 
-import io.github.tim06.xrayConfiguration.settings.Network
 import io.github.tim06.xrayConfiguration.settings.Security
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,7 +25,7 @@ data class VlessOutboundConfigurationObject(
             @SerialName("id")
             val id: String,
             @SerialName("encryption")
-            val encryption: Security = Security.NONE,
+            val encryption: Security,
             @SerialName("flow")
             val flow: Flow,
             @SerialName("level")
@@ -42,10 +41,10 @@ data class VlessOutboundConfigurationObject(
                 NONE,
 
                 @SerialName("xtls-rprx-vision")
-                XTLS_RPRX_VISION,
+                `XTLS-RPRX-VISION`,
 
                 @SerialName("xtls-rprx-vision-udp443")
-                XTLS_RPRX_VISION_UDP443;
+                `XTLS-RPRX-VISION-UDP443`;
 
                 companion object {
                     fun find(name: String): Flow? {

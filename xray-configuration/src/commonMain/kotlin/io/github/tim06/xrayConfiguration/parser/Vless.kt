@@ -15,7 +15,7 @@ import io.github.tim06.xrayConfiguration.settings.tcp.Tcp
 import io.github.tim06.xrayConfiguration.settings.tcp.header.Header
 import io.github.tim06.xrayConfiguration.settings.tls.Tls
 import io.github.tim06.xrayConfiguration.settings.ws.Ws
-import kotlinx.serialization.SerialName
+import net.thauvin.erik.urlencoder.UrlEncoderUtil
 
 fun vless(uri: String): XrayConfiguration {
     val id = uri.substringAfter("://").substringBefore("@")
@@ -33,7 +33,7 @@ fun vless(uri: String): XrayConfiguration {
     val pbk = params["pbk"]
     val fp = params["fp"]
     val sid = params["sid"]
-    val spx = params["spx"]
+    val spx = params["spx"]?.let { UrlEncoderUtil.decode(it) }
 
     val sni = params["sni"]
     val alpn = params["alpn"]
@@ -53,8 +53,8 @@ fun vless(uri: String): XrayConfiguration {
                             users = listOf(
                                 User(
                                     id = id,
-                                    encryption = security,
                                     flow = flow,
+                                    encryption = Security.NONE,
                                     level = 8,
                                 )
                             ),

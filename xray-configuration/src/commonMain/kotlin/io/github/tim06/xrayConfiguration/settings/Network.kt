@@ -24,7 +24,7 @@ enum class Network {
     GRPC,
 
     @SerialName("httpupgrade")
-    HTTP_UPGRADE;
+    HTTPUPGRADE;
 
     companion object {
         fun find(name: String): io.github.tim06.xrayConfiguration.settings.Network? {

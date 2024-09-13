@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.tim06.xray-configuration"
-version = "1.0.1"
+version = "1.0.3"
 
 kotlin {
     androidTarget {
@@ -75,6 +75,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kermit)
+            implementation(libs.urlencoder)
         }
 
         commonTest.dependencies {

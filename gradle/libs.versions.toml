@@ -4,11 +4,13 @@ kotlin = "2.0.0"
 agp = "8.5.0"
 kotlinx-serialization = "1.7.1"
 kermit = "2.0.4"
+urlencoder = "1.5.0"
 
 [libraries]
 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+urlencoder = { module = "net.thauvin.erik.urlencoder:urlencoder-lib", version.ref = "urlencoder" }
 
 [plugins]
 

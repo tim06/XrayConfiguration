@@ -12,5 +12,5 @@ enum class Network {
     UDP,
 
     @SerialName("tcp,udp")
-    TCP_UDP
+    `TCP_UDP`
 }

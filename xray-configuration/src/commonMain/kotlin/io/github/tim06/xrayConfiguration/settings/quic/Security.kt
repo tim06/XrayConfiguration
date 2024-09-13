@@ -9,8 +9,8 @@ enum class Security {
     NONE,
 
     @SerialName("aes-128-gcm")
-    AES_128_GCM,
+    `AES-128-GCM`,
 
     @SerialName("chacha20-poly1305")
-    CHACHA20_POLY1305,
+    `CHACHA20-POLY1305`,
 }

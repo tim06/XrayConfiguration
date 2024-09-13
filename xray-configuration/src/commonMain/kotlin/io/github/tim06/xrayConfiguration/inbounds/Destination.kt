@@ -14,5 +14,5 @@ enum class Destination {
     @SerialName("fakedns")
     FAKEDNS,
     @SerialName("fakedns+others")
-    FAKEDNS_OTHERS,
+    `FAKEDNS+OTHERS`,
 }

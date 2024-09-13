@@ -51,7 +51,7 @@ class VlessUriParserTest {
 
     @Test
     fun uriRealityToConfigParser() {
-        val source = "vless://3b922ce2-b375-4a9b-b697-fd8472c68688@193.188.20.20:443?type=tcp&security=reality&pbk=kT05dRKuRHXOmLLJknx-ABj-7cZ8TttWsY7CgRwk8B4&fp=chrome&sni=help.ubuntu.com&sid=d6e86ce3&spx=%2F&flow=xtls-rprx-vision#om32ho5i"
+        val source = "vless://859b7d71-a9fc-4234-8e03-42eb876a170a@51.89.244.102:26703?type=tcp&security=reality&pbk=jGmjU0vrRXCnIwn0rVatYKf5ihWZhMvqidp2ceY1QAM&fp=chrome&sni=foug.ieb&sid=8c01e365&spx=%2F&flow=xtls-rprx-vision#e3k"
         val parsedModel = parse(source)
 
         val outbound = parsedModel?.outbounds?.first()
