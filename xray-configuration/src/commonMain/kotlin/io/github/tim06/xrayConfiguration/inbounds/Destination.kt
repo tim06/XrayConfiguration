@@ -13,6 +13,6 @@ enum class Destination {
     QUIC,
     @SerialName("fakedns")
     FAKEDNS,
-    @SerialName("fakedns+others")
-    `FAKEDNS+OTHERS`,
+    @SerialName("fakedns_others")
+    `FAKEDNS_OTHERS`,
 }

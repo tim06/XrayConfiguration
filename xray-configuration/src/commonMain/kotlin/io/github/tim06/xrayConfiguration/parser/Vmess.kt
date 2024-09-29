@@ -1,7 +1,6 @@
 package io.github.tim06.xrayConfiguration.parser
 
 import io.github.tim06.xrayConfiguration.Protocol
-import io.github.tim06.xrayConfiguration.XrayConfiguration
 import io.github.tim06.xrayConfiguration.json
 import io.github.tim06.xrayConfiguration.outbounds.Outbound
 import io.github.tim06.xrayConfiguration.outbounds.settings.VmessOutboundConfigurationObject
@@ -16,47 +15,43 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
-fun vmess(uri: String): XrayConfiguration {
+fun vmess(uri: String, tag: String = "proxy"): Outbound {
     val encoded = uri.substringAfter("://")
     val decoded = Base64.Default.decode(encoded).decodeToString()
     val model = json.decodeFromString<TempVmess>(decoded)
 
-    return XrayConfiguration(
-        outbounds = listOf(
-            Outbound(
-                protocol = Protocol.VMESS,
-                settings = VmessOutboundConfigurationObject(
-                    vnext = listOf(
-                        Server(
-                            address = model.add.orEmpty(),
-                            port = model.port ?: FALLBACK_PORT,
-                            users = listOf(
-                                Server.User(
-                                    id = model.id.orEmpty(),
-                                    security = (model.scy ?: model.security)?.let { Server.Security.find(it) }
-                                        ?: Server.Security.AUTO,
-                                    level = 8
-                                )
-                            )
+    return Outbound(
+        protocol = Protocol.VMESS,
+        settings = VmessOutboundConfigurationObject(
+            vnext = listOf(
+                Server(
+                    address = model.add.orEmpty(),
+                    port = model.port ?: FALLBACK_PORT,
+                    users = listOf(
+                        Server.User(
+                            id = model.id.orEmpty(),
+                            security = (model.scy ?: model.security)?.let { Server.Security.find(it) }
+                                ?: Server.Security.AUTO,
+                            level = 8
                         )
                     )
-                ),
-                streamSettings = StreamSettings(
-                    network = Network.WS,
-                    security = Security.TLS,
-                    wsSettings = Ws(
-                        headers = mapOf(
-                            "Host" to model.host.orEmpty(),
-                        ),
-                        path = model.path.orEmpty()
-                    ),
-                    tlsSettings = Tls(
-                        allowInsecure = true
-                    ).takeIf { model.tls != null }
-                ),
-                tag = "proxy"
+                )
             )
-        )
+        ),
+        streamSettings = StreamSettings(
+            network = Network.WS,
+            security = Security.TLS,
+            wsSettings = Ws(
+                headers = mapOf(
+                    "Host" to model.host.orEmpty(),
+                ),
+                path = model.path.orEmpty()
+            ),
+            tlsSettings = Tls(
+                allowInsecure = true
+            ).takeIf { model.tls != null }
+        ),
+        tag = tag
     )
 }
 

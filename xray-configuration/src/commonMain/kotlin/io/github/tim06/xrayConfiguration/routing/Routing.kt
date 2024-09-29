@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Routing(
     @SerialName("domainStrategy")
-    val domainStrategy: DomainStrategy,
+    val domainStrategy: DomainStrategy? = null,
     @SerialName("domainMatcher")
     val domainMatcher: DomainMatcher? = null,
     @SerialName("rules")
-    val rules: List<Rule>,
+    val rules: List<Rule>? = null,
     @SerialName("balancers")
     val balancers: List<Balancer>? = null
 )

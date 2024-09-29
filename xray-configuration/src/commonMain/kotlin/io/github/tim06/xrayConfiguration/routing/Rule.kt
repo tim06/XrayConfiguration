@@ -33,7 +33,7 @@ data class Rule(
     @SerialName("attrs")
     val attrs: Map<String, String>? = null,
     @SerialName("outboundTag")
-    val outboundTag: String,
+    val outboundTag: String? = null,
     @SerialName("balancerTag")
     val balancerTag: String? = null,
 )

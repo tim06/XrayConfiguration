@@ -20,6 +20,7 @@ import io.github.tim06.xrayConfiguration.routing.Rule
 import io.github.tim06.xrayConfiguration.settings.Network
 import io.github.tim06.xrayConfiguration.Protocol
 import io.github.tim06.xrayConfiguration.XrayConfiguration
+import io.github.tim06.xrayConfiguration.outbounds.settings.FreedomOutboundConfigurationObject
 import io.github.tim06.xrayConfiguration.settings.Security
 import io.github.tim06.xrayConfiguration.settings.StreamSettings
 import io.github.tim06.xrayConfiguration.settings.tcp.Tcp
@@ -116,7 +117,8 @@ class CustomConfigurationTest {
                 ),
                 Outbound(
                     protocol = Protocol.FREEDOM,
-                    tag = "direct"
+                    tag = "direct",
+                    settings = FreedomOutboundConfigurationObject()
                 ),
                 Outbound(
                     protocol = Protocol.BLACKHOLE,

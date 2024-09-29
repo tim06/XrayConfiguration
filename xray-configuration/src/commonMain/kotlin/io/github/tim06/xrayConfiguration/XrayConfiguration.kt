@@ -1,6 +1,8 @@
 package io.github.tim06.xrayConfiguration
 
 import io.github.tim06.xrayConfiguration.api.Api
+import io.github.tim06.xrayConfiguration.burstObservatory.BurstObservatoryObject
+import io.github.tim06.xrayConfiguration.burstObservatory.PingConfigObject
 import io.github.tim06.xrayConfiguration.dns.Dns
 import io.github.tim06.xrayConfiguration.dns.DnsServer
 import io.github.tim06.xrayConfiguration.fakedns.FakeDns
@@ -12,6 +14,7 @@ import io.github.tim06.xrayConfiguration.inbounds.settings.SocksInboundConfigura
 import io.github.tim06.xrayConfiguration.log.Log
 import io.github.tim06.xrayConfiguration.log.LogLevel
 import io.github.tim06.xrayConfiguration.metrics.Metrics
+import io.github.tim06.xrayConfiguration.observatory.ObservatoryObject
 import io.github.tim06.xrayConfiguration.outbounds.Outbound
 import io.github.tim06.xrayConfiguration.outbounds.settings.ShadowsocksOutboundConfigurationObject
 import io.github.tim06.xrayConfiguration.outbounds.settings.TrojanOutboundConfigurationObject
@@ -19,6 +22,7 @@ import io.github.tim06.xrayConfiguration.outbounds.settings.VlessOutboundConfigu
 import io.github.tim06.xrayConfiguration.outbounds.settings.VmessOutboundConfigurationObject
 import io.github.tim06.xrayConfiguration.policy.Policy
 import io.github.tim06.xrayConfiguration.reverse.Reverse
+import io.github.tim06.xrayConfiguration.routing.Balancer
 import io.github.tim06.xrayConfiguration.routing.DomainStrategy
 import io.github.tim06.xrayConfiguration.routing.Routing
 import io.github.tim06.xrayConfiguration.routing.Rule
@@ -54,6 +58,10 @@ data class XrayConfiguration(
     val fakedns: List<FakeDns>? = null,
     @SerialName("metrics")
     val metrics: Metrics? = null,
+    @SerialName("observatory")
+    val observatory: ObservatoryObject? = null,
+    @SerialName("burstObservatory")
+    val burstObservatory: BurstObservatoryObject? = null,
 ) {
 
     fun raw(): String = json.encodeToString(this)
@@ -90,60 +98,102 @@ data class XrayConfiguration(
         }
 
         fun XrayConfiguration.addMinimalSettings(): XrayConfiguration {
-            return copy(
-                dns = Dns(
-                    servers = listOf(
-                        DnsServer.DirectDnsServer("1.1.1.1"),
-                        DnsServer.DirectDnsServer("8.8.8.8"),
+            val dnsServers = listOf(
+                DnsServer.DirectDnsServer("1.1.1.1"),
+                DnsServer.DirectDnsServer("8.8.8.8"),
+            )
+
+            val inbounds = listOf(
+                Inbound(
+                    listen = "127.0.0.1",
+                    port = 10808,
+                    protocol = Protocol.SOCKS,
+                    settings = SocksInboundConfigurationObject(
+                        auth = SocksInboundConfigurationObject.Auth.NOAUTH,
+                        udp = true,
+                        userLevel = 8
                     ),
-                ),
-                inbounds = listOf(
-                    Inbound(
-                        listen = "127.0.0.1",
-                        port = 10808,
-                        protocol = Protocol.SOCKS,
-                        settings = SocksInboundConfigurationObject(
-                            auth = SocksInboundConfigurationObject.Auth.NOAUTH,
-                            udp = true,
-                            userLevel = 8
-                        ),
-                        sniffing = Sniffing(
-                            destOverride = listOf(Destination.HTTP, Destination.TLS),
-                            enabled = true,
-                            routeOnly = false
-                        ),
-                        tag = "socks"
+                    sniffing = Sniffing(
+                        destOverride = listOf(Destination.HTTP, Destination.TLS),
+                        enabled = true,
+                        routeOnly = false
                     ),
-                    Inbound(
-                        listen = "127.0.0.1",
-                        port = 10809,
-                        protocol = Protocol.HTTP,
-                        settings = HttpInboundConfigurationObject(
-                            userLevel = 8
-                        ),
-                        tag = "http"
-                    )
+                    tag = "socks"
                 ),
-                log = Log(level = LogLevel.Info),
-                routing = Routing(
-                    domainStrategy = DomainStrategy.IPIfNonMatch,
-                    rules = listOf(
-                        Rule(
-                            ip = listOf("1.1.1.1"),
-                            outboundTag = "proxy",
-                            port = "53"
-                        ),
-                        Rule(
-                            ip = listOf("8.8.8.8"),
-                            outboundTag = "proxy",
-                            port = "53"
-                        ),
-                        Rule(
-                            outboundTag = "proxy",
-                            port = "0-65535"
-                        )
-                    )
+                Inbound(
+                    listen = "127.0.0.1",
+                    port = 10809,
+                    protocol = Protocol.HTTP,
+                    settings = HttpInboundConfigurationObject(
+                        userLevel = 8
+                    ),
+                    tag = "http"
                 )
+            )
+
+            val balancerRule = Rule(
+                inboundTag = listOf(
+                    "socks",
+                    "http"
+                ),
+                balancerTag = "balancer"
+            )
+
+            val isMultipleOutbounds = outbounds != null && outbounds.count() > 1
+            val defaultRulesTag = if (isMultipleOutbounds) "balancer" else "proxy"
+            val routingDefaultRules = mutableListOf(
+                Rule(
+                    ip = listOf("1.1.1.1"),
+                    outboundTag = defaultRulesTag,
+                    port = "53"
+                ),
+                Rule(
+                    ip = listOf("8.8.8.8"),
+                    outboundTag = defaultRulesTag,
+                    port = "53"
+                ),
+                Rule(
+                    outboundTag = defaultRulesTag,
+                    port = "0-65535"
+                ),
+            ).apply {
+                if (isMultipleOutbounds) {
+                    add(balancerRule)
+                }
+            }
+
+            val balancer = Balancer(
+                tag = "balancer",
+                selector = outbounds?.mapNotNull { it.tag } ?: emptyList()
+            )
+            return copy(
+                dns = Dns(servers = dnsServers),
+                inbounds = inbounds,
+                log = Log(level = LogLevel.Info),
+                routing = routing?.let { routing ->
+                    routing.copy(
+                        domainStrategy = routing.domainStrategy ?: DomainStrategy.IPIfNonMatch,
+                        rules = routing.rules?.let { current ->
+                            val mutable = current.toMutableList()
+                            mutable.addAll(routingDefaultRules)
+                            mutable
+                        } ?: routingDefaultRules
+                    )
+                } ?: Routing(
+                    domainStrategy = DomainStrategy.IPIfNonMatch,
+                    rules = routingDefaultRules,
+                    balancers = listOf(balancer).takeIf { isMultipleOutbounds }
+                ),
+                burstObservatory = BurstObservatoryObject(
+                    subjectSelector = listOf("outbound"),
+                    pingConfig = PingConfigObject(
+                        destination = "http://cp.cloudflare.com/",
+                        interval = "20s",
+                        connectivity = "http://www.gstatic.com/generate_204",
+                        timeout = "2s",
+                        sampling = 3
+                    )
+                ).takeIf { isMultipleOutbounds }
             )
         }
     }
