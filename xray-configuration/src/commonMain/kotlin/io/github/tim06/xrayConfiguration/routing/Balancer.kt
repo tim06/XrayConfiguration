@@ -9,4 +9,6 @@ data class Balancer(
     val tag: String,
     @SerialName("selector")
     val selector: List<String>,
+    @SerialName("fallbackTag")
+    val fallbackTag: String,
 )

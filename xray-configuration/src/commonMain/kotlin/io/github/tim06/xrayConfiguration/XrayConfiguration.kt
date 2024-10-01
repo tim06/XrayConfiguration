@@ -22,10 +22,7 @@ import io.github.tim06.xrayConfiguration.outbounds.settings.VlessOutboundConfigu
 import io.github.tim06.xrayConfiguration.outbounds.settings.VmessOutboundConfigurationObject
 import io.github.tim06.xrayConfiguration.policy.Policy
 import io.github.tim06.xrayConfiguration.reverse.Reverse
-import io.github.tim06.xrayConfiguration.routing.Balancer
-import io.github.tim06.xrayConfiguration.routing.DomainStrategy
-import io.github.tim06.xrayConfiguration.routing.Routing
-import io.github.tim06.xrayConfiguration.routing.Rule
+import io.github.tim06.xrayConfiguration.routing.*
 import io.github.tim06.xrayConfiguration.stats.Stats
 import io.github.tim06.xrayConfiguration.transport.Transport
 import kotlinx.serialization.SerialName
@@ -140,15 +137,10 @@ data class XrayConfiguration(
             )
 
             val isMultipleOutbounds = outbounds != null && outbounds.count() > 1
-            val defaultRulesTag = if (isMultipleOutbounds) "balancer" else "proxy"
+            val defaultRulesTag = if (isMultipleOutbounds) "direct" else "proxy"
             val routingDefaultRules = mutableListOf(
                 Rule(
-                    ip = listOf("1.1.1.1"),
-                    outboundTag = defaultRulesTag,
-                    port = "53"
-                ),
-                Rule(
-                    ip = listOf("8.8.8.8"),
+                    ip = listOf("1.1.1.1", "8.8.8.8", "77.88.8.8 "),
                     outboundTag = defaultRulesTag,
                     port = "53"
                 )
@@ -160,7 +152,8 @@ data class XrayConfiguration(
 
             val balancer = Balancer(
                 tag = "balancer",
-                selector = outbounds?.mapNotNull { it.tag } ?: emptyList()
+                selector = outbounds?.mapNotNull { it.tag } ?: emptyList(),
+                fallbackTag = "direct"
             )
             return copy(
                 dns = Dns(servers = dnsServers),
@@ -181,7 +174,7 @@ data class XrayConfiguration(
                     balancers = listOf(balancer).takeIf { isMultipleOutbounds }
                 ),
                 burstObservatory = BurstObservatoryObject(
-                    subjectSelector = listOf("outbound"),
+                    subjectSelector = listOf("outbound", "direct"),
                     pingConfig = PingConfigObject(
                         destination = "http://cp.cloudflare.com/",
                         interval = "20s",
