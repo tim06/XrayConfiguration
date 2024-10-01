@@ -140,8 +140,13 @@ data class XrayConfiguration(
             val defaultRulesTag = if (isMultipleOutbounds) "direct" else "proxy"
             val routingDefaultRules = mutableListOf(
                 Rule(
-                    ip = listOf("1.1.1.1", "8.8.8.8", "77.88.8.8 "),
+                    ip = listOf("77.88.8.8"),
                     outboundTag = defaultRulesTag,
+                    port = "53"
+                ),
+                Rule(
+                    ip = listOf("1.1.1.1", "8.8.8.8"),
+                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy",
                     port = "53"
                 )
             ).apply {
@@ -174,11 +179,11 @@ data class XrayConfiguration(
                     balancers = listOf(balancer).takeIf { isMultipleOutbounds }
                 ),
                 burstObservatory = BurstObservatoryObject(
-                    subjectSelector = listOf("outbound", "direct"),
+                    subjectSelector = listOf("outbound"),
                     pingConfig = PingConfigObject(
-                        destination = "http://cp.cloudflare.com/",
+                        destination = "http://www.gstatic.com/generate_204",
                         interval = "20s",
-                        connectivity = "http://www.gstatic.com/generate_204",
+                        connectivity = "",
                         timeout = "2s",
                         sampling = 3
                     )

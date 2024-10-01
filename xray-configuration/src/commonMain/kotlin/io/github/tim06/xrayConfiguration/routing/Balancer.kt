@@ -11,4 +11,6 @@ data class Balancer(
     val selector: List<String>,
     @SerialName("fallbackTag")
     val fallbackTag: String,
+    @SerialName("strategy")
+    val strategy: Strategy = Strategy(),
 )
