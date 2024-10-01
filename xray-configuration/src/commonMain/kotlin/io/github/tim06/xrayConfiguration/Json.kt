@@ -11,4 +11,5 @@ internal val json = Json {
     ignoreUnknownKeys = true
     prettyPrint = true
     classDiscriminatorMode = ClassDiscriminatorMode.NONE
+    coerceInputValues = true
 }

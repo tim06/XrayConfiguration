@@ -151,11 +151,7 @@ data class XrayConfiguration(
                     ip = listOf("8.8.8.8"),
                     outboundTag = defaultRulesTag,
                     port = "53"
-                ),
-                Rule(
-                    outboundTag = defaultRulesTag,
-                    port = "0-65535"
-                ),
+                )
             ).apply {
                 if (isMultipleOutbounds) {
                     add(balancerRule)

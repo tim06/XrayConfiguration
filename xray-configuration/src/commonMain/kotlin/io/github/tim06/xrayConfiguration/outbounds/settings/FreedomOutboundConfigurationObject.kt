@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FreedomOutboundConfigurationObject(
     @SerialName("domainStrategy")
-    val domainStrategy: io.github.tim06.xrayConfiguration.settings.DomainStrategy? = null,
+    val domainStrategy: DomainStrategy? = null,
     @SerialName("redirect")
     val redirect: String? = null,
     @SerialName("userLevel")

@@ -46,13 +46,13 @@ object OutboundObjectSerializer : KSerializer<Outbound> {
     override fun serialize(encoder: Encoder, value: Outbound) {
         val jsonEncoder = encoder as? JsonEncoder ?: throw SerializationException("This class can be saved only by JSON")
         val jsonObject = buildJsonObject {
-            put("sendThrough", value.sendThrough)
+            value.sendThrough?.let { put("sendThrough", it) }
             put("protocol", jsonEncoder.json.encodeToJsonElement(value.protocol))
             put("settings", jsonEncoder.json.encodeToJsonElement(value.settings))
-            put("streamSettings", jsonEncoder.json.encodeToJsonElement(value.streamSettings))
+            value.streamSettings?.let { put("streamSettings", jsonEncoder.json.encodeToJsonElement(it)) }
             put("tag", value.tag)
-            put("proxySettings", jsonEncoder.json.encodeToJsonElement(value.proxySettings))
-            put("mux", jsonEncoder.json.encodeToJsonElement(value.mux))
+            value.proxySettings?.let { put("proxySettings", jsonEncoder.json.encodeToJsonElement(it)) }
+            value.mux?.let { put("mux", jsonEncoder.json.encodeToJsonElement(value.mux)) }
         }
         jsonEncoder.encodeJsonElement(jsonObject)
     }

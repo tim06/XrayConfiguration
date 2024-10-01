@@ -43,7 +43,7 @@ object InboundObjectSerializer : KSerializer<Inbound> {
             put("port", value.port)
             put("protocol", jsonEncoder.json.encodeToJsonElement(value.protocol))
             put("settings", jsonEncoder.json.encodeToJsonElement(value.settings))
-            put("sniffing", jsonEncoder.json.encodeToJsonElement(value.sniffing))
+            value.sniffing?.let { put("sniffing", jsonEncoder.json.encodeToJsonElement(it)) }
             put("tag", value.tag)
         }
         jsonEncoder.encodeJsonElement(jsonObject)
