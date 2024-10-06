@@ -1,12 +1,10 @@
-import com.vanniktech.maven.publish.SonatypeHost
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlinx.serialization)
-    id("maven-publish")
-    id("com.vanniktech.maven.publish") version "0.29.0"
+    id("publish.plugin")
 }
 
 group = "io.github.tim06.xray-configuration"
@@ -106,37 +104,5 @@ android {
     buildTypes {
         debug {  }
         release {  }
-    }
-}
-
-mavenPublishing {
-    publishToMavenCentral(SonatypeHost.S01)
-    signAllPublications()
-
-    pom {
-        name.set("Xray-configuration")
-        description.set("KMP Xray configuration library.")
-        inceptionYear.set("2024")
-        url.set("https://github.com/tim06/XrayConfiguration/")
-        licenses {
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set("tim06")
-                name.set("Timur Hojatov")
-                url.set("https://github.com/tim06")
-                email.set("timhod06@gmail.com")
-            }
-        }
-        scm {
-            url.set("https://github.com/tim06/XrayConfiguration/")
-            connection.set("scm:git:git://github.com/tim06/XrayConfiguration.git")
-            developerConnection.set("scm:git:ssh://git@github.com:tim06/XrayConfiguration.git")
-        }
     }
 }
