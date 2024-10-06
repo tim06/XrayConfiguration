@@ -1,63 +1,42 @@
 # XrayConfiguration
+## Kotlin Multiplatform Library
 
-Kotlin Multiplatform Library
+### Import
 
-### Publish to MavenCentral
-
-1) Registering a Sonatype account as described here: 
-   https://dev.to/kotlin/how-to-build-and-publish-a-kotlin-multiplatform-library-going-public-4a8k
-2) Add developer id, name, email and the project url to
-   `/convention-plugins/src/main/kotlin/convention.publication.gradle.kts`
-3) Add the secrets to `local.properties`:
+#### KMP
 
 ```
-signing.keyId=...
-signing.password=...
-signing.secretKeyRingFile=...
-ossrhUsername=...
-ossrhPassword=...
+implementation("io.github.tim06.xray-configuration:xray-configuration:1.0.8")
 ```
 
-4) Run `./gradlew :xray-configuration:publishAllPublicationsToSonatypeRepository`
+#### Android
 
-### Build platform artifacts
+```
+implementation("io.github.tim06.xray-configuration:xray-configuration-android:1.0.8")
+```
 
-#### Android aar
+#### iOS
 
-- Run `./gradlew :xray-configuration:assembleRelease`
-- Output: `/xray-configuration/build/outputs/aar/xray-configuration-release.aar`
+Use xcframework from releases
 
-#### JVM jar
+### Code
 
-- Run `./gradlew :xray-configuration:jvmJar`
-- Output: `/xray-configuration/build/libs/xray-configuration-jvm-1.0.jar`
+#### Parse xray uri
+```
+# Single
+io.github.tim06.xrayConfiguration.parser.Parser.parse("xray_uri")
+# Multiple
+io.github.tim06.xrayConfiguration.parser.Parser.parse(["xray_uri_1", "xray_uri_2"])
+```
 
-#### iOS Framework
+#### Parse full xray config
 
-- Run `./gradlew :xray-configuration:linkReleaseFrameworkIosArm64`
-- Output: `/xray-configuration/build/bin/iosArm64/releaseFramework/xray-configuration.framework`
+```
+io.github.tim06.xrayConfiguration.XrayConfiguration.fromJson("full_xray_configuration")
+```
 
-#### JS file
+##### Configuration to json
 
-- Run `./gradlew :xray-configuration:jsBrowserProductionWebpack`
-- Output: `/xray-configuration/build/dist/js/productionExecutable/xray-configuration.js`
-
-#### macOS Framework
-
-- Run `./gradlew :xray-configuration:linkReleaseFrameworkMacosArm64`
-- Output: `/xray-configuration/build/bin/macosArm64/releaseFramework/xray-configuration.framework`
-
-#### Linux static library
-
-- Run `./gradlew :xray-configuration:linkReleaseStaticLinuxX64`
-- Output: `/xray-configuration/build/bin/linuxX64/releaseStatic/libxray-configuration.a`
-
-#### Windows static library
-
-- Run `./gradlew :xray-configuration:linkReleaseStaticMingwX64`
-- Output: `/xray-configuration/build/bin/mingwX64/releaseStatic/libxray-configuration.a`
-
-#### Wasm binary file
-
-- Run `./gradlew :xray-configuration:wasmJsBrowserDistribution`
-- Output: `/xray-configuration/build/dist/wasmJs/productionExecutable/xray-configuration-wasm-js.wasm`
+```
+io.github.tim06.xrayConfiguration.XrayConfiguration.raw()
+```
