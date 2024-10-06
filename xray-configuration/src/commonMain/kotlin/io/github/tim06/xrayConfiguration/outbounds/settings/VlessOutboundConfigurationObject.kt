@@ -3,6 +3,8 @@ package io.github.tim06.xrayConfiguration.outbounds.settings
 import io.github.tim06.xrayConfiguration.settings.Security
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 @Serializable
 data class VlessOutboundConfigurationObject(
@@ -32,6 +34,8 @@ data class VlessOutboundConfigurationObject(
             val level: Int,
         ) {
 
+            @OptIn(ExperimentalObjCRefinement::class)
+            @HiddenFromObjC
             @Serializable
             enum class Flow {
                 @SerialName("")

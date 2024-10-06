@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.SonatypeHost
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -9,7 +10,7 @@ plugins {
 }
 
 group = "io.github.tim06.xray-configuration"
-version = "1.0.7"
+version = "1.0.8"
 
 kotlin {
     androidTarget {
@@ -37,6 +38,7 @@ kotlin {
         binaries.executable()
     }*/
 
+    val xcf = XCFramework()
     listOf(
         iosX64(),
         iosArm64(),
@@ -45,6 +47,7 @@ kotlin {
         it.binaries.framework {
             baseName = "xray-configuration"
             isStatic = true
+            xcf.add(this)
         }
     }
 

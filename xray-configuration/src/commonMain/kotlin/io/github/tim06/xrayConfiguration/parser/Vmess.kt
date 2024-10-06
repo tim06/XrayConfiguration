@@ -48,7 +48,8 @@ fun vmess(uri: String, tag: String = "proxy"): Outbound {
                 path = model.path.orEmpty()
             ),
             tlsSettings = Tls(
-                allowInsecure = true
+                serverName = model.sni,
+                allowInsecure = true,
             ).takeIf { model.tls != null }
         ),
         tag = tag
@@ -70,4 +71,6 @@ private data class TempVmess(
     val type: String? = null,
     val security: String? = null,
     val scy: String? = null,
+    val alpn: String? = null,
+    val fp: String? = null,
 )

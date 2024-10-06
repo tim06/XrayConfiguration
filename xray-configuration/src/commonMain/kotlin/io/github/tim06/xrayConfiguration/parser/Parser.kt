@@ -11,6 +11,13 @@ fun parse(uris: List<String>): List<Outbound> {
     return outbounds
 }
 
+fun parseToConfiguration(uris: List<String>): XrayConfiguration {
+    val outbounds: List<Outbound> = uris.mapIndexedNotNull { index, uri ->
+        runCatching { parse(uri = uri, tag = "outbound-$index") }.getOrNull()
+    }
+    return outbounds.toConfiguration()
+}
+
 fun parse(uri: String, tag: String = "proxy"): Outbound? {
     val protocol: Protocol? = uri.takeWhile { protocol -> protocol != ':' }
         .let { runCatching { Protocol.find(it) }.getOrNull() }

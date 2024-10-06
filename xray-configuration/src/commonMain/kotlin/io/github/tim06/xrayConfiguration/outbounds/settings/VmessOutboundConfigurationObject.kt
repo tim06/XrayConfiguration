@@ -1,8 +1,9 @@
 package io.github.tim06.xrayConfiguration.outbounds.settings
 
-import io.github.tim06.xrayConfiguration.inbounds.settings.Method
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 @Serializable
 data class VmessOutboundConfigurationObject(
@@ -30,6 +31,8 @@ data class VmessOutboundConfigurationObject(
             val level: Int? = null,
         )
 
+        @OptIn(ExperimentalObjCRefinement::class)
+        @HiddenFromObjC
         @Serializable
         enum class Security {
             @SerialName("none")

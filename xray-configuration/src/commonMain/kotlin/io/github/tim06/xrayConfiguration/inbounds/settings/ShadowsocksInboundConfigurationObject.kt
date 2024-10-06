@@ -3,6 +3,8 @@ package io.github.tim06.xrayConfiguration.inbounds.settings
 import kotlinx.serialization.Serializable
 import io.github.tim06.xrayConfiguration.routing.Network
 import kotlinx.serialization.SerialName
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
 
 @Serializable
 data class ShadowsocksInboundConfigurationObject(
@@ -33,6 +35,8 @@ data class ShadowsocksInboundConfigurationObject(
     )
 }
 
+@OptIn(ExperimentalObjCRefinement::class)
+@HiddenFromObjC
 @Serializable
 enum class Method {
     @SerialName("2022-blake3-aes-128-gcm")
