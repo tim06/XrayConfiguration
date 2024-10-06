@@ -158,7 +158,6 @@ data class XrayConfiguration(
             val balancer = Balancer(
                 tag = "balancer",
                 selector = outbounds?.mapNotNull { it.tag } ?: emptyList(),
-                fallbackTag = "direct"
             )
             return copy(
                 dns = Dns(servers = dnsServers),
