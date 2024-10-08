@@ -5,6 +5,7 @@ import io.github.tim06.xrayConfiguration.burstObservatory.BurstObservatoryObject
 import io.github.tim06.xrayConfiguration.burstObservatory.PingConfigObject
 import io.github.tim06.xrayConfiguration.dns.Dns
 import io.github.tim06.xrayConfiguration.dns.DnsServer
+import io.github.tim06.xrayConfiguration.dns.QueryStrategy
 import io.github.tim06.xrayConfiguration.fakedns.FakeDns
 import io.github.tim06.xrayConfiguration.inbounds.Destination
 import io.github.tim06.xrayConfiguration.inbounds.Inbound
@@ -160,7 +161,11 @@ data class XrayConfiguration(
                 selector = outbounds?.mapNotNull { it.tag } ?: emptyList(),
             )
             return copy(
-                dns = Dns(servers = dnsServers),
+                dns = Dns(
+                    servers = dnsServers,
+                    disableCache = true,
+                    queryStrategy = QueryStrategy.UseIPv4
+                ),
                 inbounds = inbounds,
                 log = Log(level = LogLevel.Info),
                 routing = routing?.let { routing ->
