@@ -50,6 +50,7 @@ fun vmess(uri: String, tag: String = "proxy"): Outbound {
             tlsSettings = Tls(
                 serverName = model.sni,
                 allowInsecure = true,
+                fingerprint = model.fp
             ).takeIf { model.tls != null }
         ),
         tag = tag

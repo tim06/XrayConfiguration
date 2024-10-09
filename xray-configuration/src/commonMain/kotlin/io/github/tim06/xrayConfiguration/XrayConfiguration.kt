@@ -5,7 +5,6 @@ import io.github.tim06.xrayConfiguration.burstObservatory.BurstObservatoryObject
 import io.github.tim06.xrayConfiguration.burstObservatory.PingConfigObject
 import io.github.tim06.xrayConfiguration.dns.Dns
 import io.github.tim06.xrayConfiguration.dns.DnsServer
-import io.github.tim06.xrayConfiguration.dns.QueryStrategy
 import io.github.tim06.xrayConfiguration.fakedns.FakeDns
 import io.github.tim06.xrayConfiguration.inbounds.Destination
 import io.github.tim06.xrayConfiguration.inbounds.Inbound
@@ -17,10 +16,7 @@ import io.github.tim06.xrayConfiguration.log.LogLevel
 import io.github.tim06.xrayConfiguration.metrics.Metrics
 import io.github.tim06.xrayConfiguration.observatory.ObservatoryObject
 import io.github.tim06.xrayConfiguration.outbounds.Outbound
-import io.github.tim06.xrayConfiguration.outbounds.settings.ShadowsocksOutboundConfigurationObject
-import io.github.tim06.xrayConfiguration.outbounds.settings.TrojanOutboundConfigurationObject
-import io.github.tim06.xrayConfiguration.outbounds.settings.VlessOutboundConfigurationObject
-import io.github.tim06.xrayConfiguration.outbounds.settings.VmessOutboundConfigurationObject
+import io.github.tim06.xrayConfiguration.outbounds.settings.*
 import io.github.tim06.xrayConfiguration.policy.Policy
 import io.github.tim06.xrayConfiguration.reverse.Reverse
 import io.github.tim06.xrayConfiguration.routing.*
@@ -98,7 +94,6 @@ data class XrayConfiguration(
         fun XrayConfiguration.addMinimalSettings(): XrayConfiguration {
             val dnsServers = listOf(
                 DnsServer.DirectDnsServer("1.1.1.1"),
-                DnsServer.DirectDnsServer("8.8.8.8"),
             )
 
             val inbounds = listOf(
@@ -129,6 +124,16 @@ data class XrayConfiguration(
                 )
             )
 
+            val blackholeOutbound = Outbound(
+                protocol = Protocol.BLACKHOLE,
+                settings = BlackholeOutboundConfigurationObject(
+                    response = BlackholeOutboundConfigurationObject.Response(
+                        type = BlackholeOutboundConfigurationObject.Response.Type.HTTP
+                    )
+                ),
+                tag = "block"
+            )
+
             val balancerRule = Rule(
                 inboundTag = listOf(
                     "socks",
@@ -146,9 +151,63 @@ data class XrayConfiguration(
                     port = "53"
                 ),
                 Rule(
-                    ip = listOf("1.1.1.1", "8.8.8.8"),
+                    ip = listOf("1.1.1.1"),
                     outboundTag = if (isMultipleOutbounds) "balancer" else "proxy",
                     port = "53"
+                ),
+                Rule(
+                    domain = listOf("domain:googleapis.cn", "domain:gstatic.com"),
+                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy",
+                ),
+                Rule(
+                    network = Network.UDP,
+                    outboundTag = "block",
+                    port = "443"
+                ),
+                Rule(
+                    ip = listOf("geoip:private"),
+                    outboundTag = "direct"
+                ),
+                Rule(
+                    domain = listOf(
+                        "domain:dns.alidns.com",
+                        "domain:doh.pub",
+                        "domain:dot.pub",
+                        "domain:doh.360.cn",
+                        "domain:dot.360.cn",
+                        "geosite:cn",
+                        "geosite:geolocation-cn"
+                    ),
+                    outboundTag = "direct"
+                ),
+                Rule(
+                    ip = listOf(
+                        "223.5.5.5/32",
+                        "223.6.6.6/32",
+                        "2400:3200::1/128",
+                        "2400:3200:baba::1/128",
+                        "119.29.29.29/32",
+                        "1.12.12.12/32",
+                        "120.53.53.53/32",
+                        "2402:4e00::/128",
+                        "2402:4e00:1::/128",
+                        "180.76.76.76/32",
+                        "2400:da00::6666/128",
+                        "114.114.114.114/32",
+                        "114.114.115.115/32",
+                        "180.184.1.1/32",
+                        "180.184.2.2/32",
+                        "101.226.4.6/32",
+                        "218.30.118.6/32",
+                        "123.125.81.6/32",
+                        "140.207.198.6/32",
+                        "geoip:cn"
+                    ),
+                    outboundTag = "direct"
+                ),
+                Rule(
+                    port = "0-65535",
+                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy"
                 )
             ).apply {
                 if (isMultipleOutbounds) {
@@ -164,9 +223,13 @@ data class XrayConfiguration(
                 dns = Dns(
                     servers = dnsServers,
                     disableCache = true,
-                    queryStrategy = QueryStrategy.UseIPv4
                 ),
                 inbounds = inbounds,
+                outbounds = outbounds?.let { outbounds ->
+                    val current = outbounds.toMutableList()
+                    current.add(blackholeOutbound)
+                    current
+                } ?: listOf(blackholeOutbound),
                 log = Log(level = LogLevel.Info),
                 routing = routing?.let { routing ->
                     routing.copy(
