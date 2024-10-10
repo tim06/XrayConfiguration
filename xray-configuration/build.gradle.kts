@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.tim06.xray-configuration"
-version = "1.0.10"
+version = "1.0.11"
 
 kotlin {
     androidTarget {

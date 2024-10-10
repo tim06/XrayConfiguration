@@ -152,12 +152,14 @@ data class XrayConfiguration(
                 ),
                 Rule(
                     ip = listOf("1.1.1.1"),
-                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy",
+                    outboundTag = "proxy".takeIf { !isMultipleOutbounds },
+                    balancerTag = "balancer".takeIf { isMultipleOutbounds },
                     port = "53"
                 ),
                 Rule(
                     domain = listOf("domain:googleapis.cn", "domain:gstatic.com"),
-                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy",
+                    outboundTag = "proxy".takeIf { !isMultipleOutbounds },
+                    balancerTag = "balancer".takeIf { isMultipleOutbounds },
                 ),
                 Rule(
                     network = Network.UDP,
@@ -207,7 +209,8 @@ data class XrayConfiguration(
                 ),
                 Rule(
                     port = "0-65535",
-                    outboundTag = if (isMultipleOutbounds) "balancer" else "proxy"
+                    outboundTag = "proxy".takeIf { !isMultipleOutbounds },
+                    balancerTag = "balancer".takeIf { isMultipleOutbounds },
                 )
             ).apply {
                 if (isMultipleOutbounds) {
